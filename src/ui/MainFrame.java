@@ -8,10 +8,11 @@ package ui;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JProgressBar;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import model.Page;
+import model.WebPageCacheTable;
 
 /**
  *
@@ -24,7 +25,7 @@ public class MainFrame extends javax.swing.JFrame {
      */
     public MainFrame() {
         initComponents();
-        
+
         //setup
         MouseListener mouseListener = new MouseAdapter() {
             public void mouseClicked(MouseEvent mouseEvent) {
@@ -34,6 +35,16 @@ public class MainFrame extends javax.swing.JFrame {
                     if (index >= 0) {
                         Object o = theList.getModel().getElementAt(index);
                         System.out.println("-clicked on: " + o.toString());
+                        String url=o.toString();
+                        Page page = WebPageCacheTable.getInstance().get(url);
+                        StringBuilder sb=new StringBuilder();
+                        sb.append(String.format("%10s %s", "url:",url)).append(System.lineSeparator());
+                        sb.append(String.format("%10s %s", "filename:",page.getLocalFileName())).append(System.lineSeparator());
+                        sb.append(String.format("%10s %s", "last accessed date:",page.getLastAccessedDate()))
+                                .append(System.lineSeparator());
+                        sb.append(String.format("%10s %s", "total terms:",page.getTotalTerms())).append(System.lineSeparator());
+                        sb.append(String.format("%10s %s", "tf-idf::",page.getTf_idfTable())).append(System.lineSeparator());
+                        jTextArea1.setText(sb.toString());
                     }
                 }
             }
@@ -72,6 +83,11 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel1.setText("web pages");
 
         searchbtn.setText("Search");
+        searchbtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchbtnActionPerformed(evt);
+            }
+        });
 
         jTextArea1.setEditable(false);
         jTextArea1.setColumns(20);
@@ -117,6 +133,10 @@ public class MainFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void searchbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchbtnActionPerformed
+        System.out.println(WebPageCacheTable.getInstance().getTotalContainingDocuments("in"));
+    }//GEN-LAST:event_searchbtnActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -150,6 +170,15 @@ public class MainFrame extends javax.swing.JFrame {
                 new MainFrame().setVisible(true);
             }
         });
+    }
+
+    public void loadToGUI() {
+        DefaultListModel<String> dlm = new DefaultListModel<>();
+        for (String url : WebPageCacheTable.getInstance().keySet()) {
+            dlm.addElement(url);
+        }
+        webpagelist.setModel(dlm);
+
     }
 
     public JProgressBar getjProgressBar1() {

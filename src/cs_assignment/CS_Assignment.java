@@ -16,13 +16,17 @@ import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.Page;
+import model.WebPageCacheTable;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import ui.MainFrame;
 import util.Constants;
+import util.util;
 
 /**
  *
@@ -36,8 +40,8 @@ public class CS_Assignment {
     static MainFrame mf;
     private static int webpageCount;
     private static int current;
-    
-    
+    private static WebPageCacheTable webPageCacheTable = WebPageCacheTable.getInstance();
+
     public static void main(String[] args) {
         mf = new MainFrame();
         mf.setVisible(true);
@@ -45,6 +49,7 @@ public class CS_Assignment {
         mf.getjProgressBar1().setStringPainted(true);
         mf.getjProgressBar1().setMinimum(0);
 
+        System.out.println(webPageCacheTable.equals(WebPageCacheTable.getInstance()));
         readControlFile();
     }
 
@@ -76,7 +81,10 @@ public class CS_Assignment {
                 });
                 t.run();
             }
+
             mf.getjProgressBar1().setString("Loading Data ...");
+            calculateIDFTable();
+            //calculateTF_IDFTable();
             loadDatatoGUI();
 
         } catch (Exception e) {
@@ -103,6 +111,11 @@ public class CS_Assignment {
             }
             calculatePageData(sb, page);
             createFile(sb, url, page);
+
+            //updating cache
+            webPageCacheTable.put(st, page);
+            System.out.println(webPageCacheTable);
+
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
@@ -136,7 +149,6 @@ public class CS_Assignment {
         }
     }
 
-    
     //generating a local file name string from url
     private static String generateFileName(URL url) {
         String[] filenameAr = url.toString().split("//")[1].split("/");
@@ -155,7 +167,7 @@ public class CS_Assignment {
 
     //calculating last accessed date
     private static Date calculateDate(String line) {
-        
+
         Document doc = Jsoup.parse(line);
         String[] strAr = doc.body().text().split(" ");
         String date = strAr[6].trim();
@@ -177,17 +189,15 @@ public class CS_Assignment {
 
     private static void calculatePageData(StringBuilder sb, Page page) {
         //calculate tf-idf and other page data for each and every page
-        
-        
         //getting text neglecting html tags
         Document doc = Jsoup.parse(sb.toString());
         String text = doc.body().text();
 
-        System.out.println("calculating page data");
-        System.out.println(text);
+        page.setTotalTerms(util.getTotalWords(text));
+        page.setWordCountTable(util.getWordCountsTable(text));
+        //calculating word count
     }
 
-    
     //counting total no of web pages
     private static int getPageCount(File f) throws Exception {
         BufferedReader br = new BufferedReader(new FileReader(f));
@@ -200,5 +210,44 @@ public class CS_Assignment {
 
     private static void loadDatatoGUI() {
         //load page data to gui
+        mf.loadToGUI();
+    }
+
+    private static void calculateIDFTable() {
+        Hashtable<String, Double> idfTable = webPageCacheTable.getIdfTable();
+        Enumeration<String> idftablekeys = idfTable.keys();
+        System.out.println("idf table....");
+        int totalDocs = webPageCacheTable.getTotalDocuments();
+        while (idftablekeys.hasMoreElements()) {
+            String word = idftablekeys.nextElement();
+
+            double idf = Math.log1p(totalDocs / webPageCacheTable.getTotalContainingDocuments(word));
+            idfTable.put(word, idf);
+        }
+        System.out.println(idfTable);
+        System.out.println("*****");
+    }
+
+    private static void calculateTF_IDFTable() {
+        Enumeration<String> keys = webPageCacheTable.keys();
+        while (keys.hasMoreElements()) {
+            String key = keys.nextElement();
+            Page page = webPageCacheTable.get(key);
+            //creating clone of tf table
+            Hashtable<String, Double> clone = (Hashtable< String, Double>) page.getTfTable().clone();
+            //iterating tf table
+            Enumeration<String> clonekeys = clone.keys();
+            while (clonekeys.hasMoreElements()) {
+                String nextElement = clonekeys.nextElement();
+                System.out.println("print key: "+nextElement);
+                //System.out.println(clone.get(key));
+                clone.put(nextElement, clone.get(key) / webPageCacheTable.getIdfTable().get(nextElement));
+            }
+            page.setTf_idfTable(clone);
+            System.out.println("***tf-idftable - "+key+"***");
+            //System.out.println(page.getTf_idfTable());
+            System.out.println("******");
+        }
+
     }
 }

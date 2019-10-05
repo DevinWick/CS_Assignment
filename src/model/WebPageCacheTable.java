@@ -5,6 +5,7 @@
  */
 package model;
 
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 
@@ -12,6 +13,15 @@ import java.util.Hashtable;
 public class WebPageCacheTable extends Hashtable<String, Page>{
     
     private static WebPageCacheTable instance;
+    
+    private Hashtable<String,Double> idfTable;
+
+    public Hashtable<String, Double> getIdfTable() {
+        if(idfTable==null){
+            idfTable=new Hashtable<>();
+        }
+        return idfTable;
+    }
     
     private WebPageCacheTable(){
         
@@ -28,13 +38,16 @@ public class WebPageCacheTable extends Hashtable<String, Page>{
         return size();
     }
     
-    public int getTotalContainingDocuments(String key){
+    public int getTotalContainingDocuments(String word){
         int count=0;
-        for(int i=0;i<size();i++){
-            if(get(i).getWordCountTable().contains(key)){
+        Enumeration<String> keys = instance.keys();
+        while(keys.hasMoreElements()){
+            String key=keys.nextElement();
+            if(instance.get(key).getWordCountTable().containsKey(word)){
                 count++;
             }
         }
+        
         return count;
     }
 }
