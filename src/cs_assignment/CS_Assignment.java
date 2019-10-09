@@ -183,7 +183,7 @@ public class CS_Assignment {
 
     }
 
-    private static void calculatePageData(StringBuilder sb, Page page) {
+    public static void calculatePageData(StringBuilder sb, Page page) {
         //calculate tf-idf and other page data for each and every page
         //getting text neglecting html tags
         Document doc = Jsoup.parse(sb.toString());
