@@ -5,19 +5,18 @@
  */
 package ui;
 
+import java.awt.JobAttributes;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import model.Page;
 import model.WebPageCacheTable;
 
-/**
- *
- * @author Devin
- */
+
 public class MainFrame extends javax.swing.JFrame {
 
     /**
@@ -25,10 +24,12 @@ public class MainFrame extends javax.swing.JFrame {
      */
     public MainFrame() {
         initComponents();
+        
 
         //setup
         MouseListener mouseListener = new MouseAdapter() {
             public void mouseClicked(MouseEvent mouseEvent) {
+                jTextArea1.setText("Loading Data ...");
                 JList theList = (JList) mouseEvent.getSource();
                 if (mouseEvent.getClickCount() == 1) {
                     int index = theList.locationToIndex(mouseEvent.getPoint());
@@ -44,6 +45,7 @@ public class MainFrame extends javax.swing.JFrame {
                                 .append(System.lineSeparator());
                         sb.append(String.format("%10s %s", "total terms:",page.getTotalTerms())).append(System.lineSeparator());
                         sb.append(String.format("%10s %s", "tf-idf::",page.getTf_idfTable())).append(System.lineSeparator());
+                        System.out.println(page.getTf_idfTable());
                         jTextArea1.setText(sb.toString());
                     }
                 }
@@ -74,7 +76,7 @@ public class MainFrame extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         webpagelist.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            String[] strings = { "Loading Data..." };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
@@ -134,7 +136,7 @@ public class MainFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void searchbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchbtnActionPerformed
-        System.out.println(WebPageCacheTable.getInstance().getTotalContainingDocuments("in"));
+        
     }//GEN-LAST:event_searchbtnActionPerformed
 
     /**

@@ -28,10 +28,6 @@ import ui.MainFrame;
 import util.Constants;
 import util.util;
 
-/**
- *
- * @author Devin
- */
 public class CS_Assignment {
 
     /**
@@ -84,7 +80,7 @@ public class CS_Assignment {
 
             mf.getjProgressBar1().setString("Loading Data ...");
             calculateIDFTable();
-            //calculateTF_IDFTable();
+            calculateTF_IDFTable();
             loadDatatoGUI();
 
         } catch (Exception e) {
@@ -239,15 +235,10 @@ public class CS_Assignment {
             Enumeration<String> clonekeys = clone.keys();
             while (clonekeys.hasMoreElements()) {
                 String nextElement = clonekeys.nextElement();
-                System.out.println("print key: "+nextElement);
-                //System.out.println(clone.get(key));
-                clone.put(nextElement, clone.get(key) / webPageCacheTable.getIdfTable().get(nextElement));
+                clone.put(nextElement, clone.get(nextElement) / webPageCacheTable.getIdfTable().get(nextElement));
             }
             page.setTf_idfTable(clone);
-            System.out.println("***tf-idftable - "+key+"***");
-            //System.out.println(page.getTf_idfTable());
-            System.out.println("******");
         }
-
+        
     }
 }

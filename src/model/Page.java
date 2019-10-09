@@ -11,10 +11,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-/**
- *
- * @author Devin
- */
+
 public class Page {
 
     private String localFileName;
@@ -25,7 +22,7 @@ public class Page {
     private Hashtable<String, Double> tf_idfTable;
 
     public Hashtable<String, Double> getTf_idfTable() {
-        if(tf_idfTable!=null){
+        if(tf_idfTable==null){
             tf_idfTable=new Hashtable<>();
         }
         return tf_idfTable;

@@ -5,10 +5,7 @@
  */
 package util;
 
-/**
- *
- * @author Devin
- */
+
 public class Constants {
     public static String DATE_FORMAT_PATTERN="dd MMM yyyy hh:mm";
 }

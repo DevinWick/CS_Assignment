@@ -10,10 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import model.WebPageCacheTable;
 
-/**
- *
- * @author Devin
- */
+
 public class util {
 
     public static int getWordCount(String s, String source) {
