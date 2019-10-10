@@ -7,8 +7,6 @@ THINGS COMPLETED
 - caluclating last accessed date of page
 - creating custom hashtable to store cache data of pages
 
-NOT COMPLETED
-
 -calculating tf-idf(note- needs to use regular expression here)
 	
 	TF = (Number of times term w appears in a document) / (Total number of terms in the document)
