@@ -12,6 +12,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -94,7 +96,10 @@ public class CS_Assignment {
         BufferedReader br = null;
         try {
             URL url = new URL(st);
-            br = new BufferedReader(new InputStreamReader(url.openStream()));
+            HttpURLConnection con=(HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
+            con.setConnectTimeout(5000);
+            br = new BufferedReader(new InputStreamReader(con.getInputStream()));
             String line;
             StringBuilder sb = new StringBuilder();
 
@@ -112,6 +117,8 @@ public class CS_Assignment {
             webPageCacheTable.put(st, page);
             System.out.println(webPageCacheTable);
 
+        }catch(SocketTimeoutException e){
+            e.printStackTrace();
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {

@@ -13,13 +13,13 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
+import javax.swing.JEditorPane;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import model.Page;
 import model.WebPageCacheTable;
 import util.util;
-
 
 public class MainFrame extends javax.swing.JFrame {
 
@@ -28,29 +28,46 @@ public class MainFrame extends javax.swing.JFrame {
      */
     public MainFrame() {
         initComponents();
-        
-
+        jTextArea1.setContentType("text/html");
         //setup
         MouseListener mouseListener = new MouseAdapter() {
+
             public void mouseClicked(MouseEvent mouseEvent) {
-                jTextArea1.setText("Loading Data ...");
+
                 JList theList = (JList) mouseEvent.getSource();
                 if (mouseEvent.getClickCount() == 1) {
                     int index = theList.locationToIndex(mouseEvent.getPoint());
                     if (index >= 0) {
-                        Object o = theList.getModel().getElementAt(index);
-                        System.out.println("-clicked on: " + o.toString());
-                        String url=o.toString();
-                        Page page = WebPageCacheTable.getInstance().get(url);
-                        StringBuilder sb=new StringBuilder();
-                        sb.append(String.format("%10s %s", "url:",url)).append(System.lineSeparator());
-                        sb.append(String.format("%10s %s", "filename:",page.getLocalFileName())).append(System.lineSeparator());
-                        sb.append(String.format("%10s %s", "last accessed date:",page.getLastAccessedDate()))
-                                .append(System.lineSeparator());
-                        sb.append(String.format("%10s %s", "total terms:",page.getTotalTerms())).append(System.lineSeparator());
-                        sb.append(String.format("%10s %s", "tf-idf::",page.getTf_idfTable())).append(System.lineSeparator());
-                        System.out.println(page.getTf_idfTable());
-                        jTextArea1.setText(sb.toString());
+
+                        jTextArea1.setText("Loading Page Data...");
+                        jProgressBar1.setIndeterminate(true);
+                        jProgressBar1.setString("Calculating Page Data...");
+
+                        //displaying data on gui
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Object o = theList.getModel().getElementAt(index);
+                                System.out.println("-clicked on: " + o.toString());
+                                String url = o.toString();
+                                Page page = WebPageCacheTable.getInstance().get(url);
+                                StringBuilder sb = new StringBuilder("");
+                                sb.append(String.format("%s%s", "<h3>Url</h3>", "<a href='" + url + "'>" + url + "</a>")).append("\n\n");
+                                jProgressBar1.setValue(1);
+                                sb.append(String.format("%s%s", "<h3>Filename</h3>", page.getLocalFileName())).append("\n\n");;
+                                jProgressBar1.setValue(2);
+                                sb.append(String.format("%s%s", "<h3>Last Accessed Date</h3>", page.getLastAccessedDate()))
+                                        .append("\n\n");
+                                jProgressBar1.setValue(3);
+                                sb.append(String.format("%s%s", "<h3>Total terms</h3>", page.getTotalTerms())).append("\n\n");
+                                jProgressBar1.setValue(4);
+                                sb.append(String.format("%s%s", "<h3>TF-IDF</h3>", page.getTf_idfTable())).append("\n\n");
+                                jTextArea1.setText(sb.toString());
+                                jProgressBar1.setValue(5);
+                                jProgressBar1.setIndeterminate(false);
+                                jProgressBar1.setString("Done");
+                            }
+                        }).start();
                     }
                 }
             }
@@ -74,9 +91,9 @@ public class MainFrame extends javax.swing.JFrame {
         jProgressBar1 = new javax.swing.JProgressBar();
         searchtf = new javax.swing.JTextField();
         searchbtn = new javax.swing.JButton();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
         jButton1 = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jTextArea1 = new javax.swing.JEditorPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -96,17 +113,16 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
-        jTextArea1.setEditable(false);
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane2.setViewportView(jTextArea1);
-
         jButton1.setText("Refresh");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
+
+        jTextArea1.setEditable(false);
+        jTextArea1.setBackground(new java.awt.Color(240, 240, 240));
+        jScrollPane3.setViewportView(jTextArea1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -124,13 +140,13 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(jLabel1))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 498, Short.MAX_VALUE)
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
                         .addGap(26, 26, 26)
                         .addComponent(jButton1)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(55, 55, 55)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 461, Short.MAX_VALUE)
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -146,7 +162,7 @@ public class MainFrame extends javax.swing.JFrame {
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane2)
+                    .addComponent(jScrollPane3)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -155,14 +171,25 @@ public class MainFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void searchbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchbtnActionPerformed
-        try {
-            DefaultListModel<String> dlm = new DefaultListModel<>();
-            String result=util.compareWebPages(searchtf.getText());
-            dlm.addElement(result);
-            webpagelist.setModel(dlm);
-        } catch (IOException ex) {
-            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
+
+        jProgressBar1.setIndeterminate(true);
+        jProgressBar1.setString("Searching...");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    DefaultListModel<String> dlm = new DefaultListModel<>();
+                    String result = util.compareWebPages(searchtf.getText());
+                    dlm.addElement(result);
+                    webpagelist.setModel(dlm);
+                    jProgressBar1.setIndeterminate(false);
+                    jProgressBar1.setString("Match Found");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
     }//GEN-LAST:event_searchbtnActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -227,9 +254,9 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSpinner jSpinner1;
-    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JEditorPane jTextArea1;
     private javax.swing.JButton searchbtn;
     private javax.swing.JTextField searchtf;
     private javax.swing.JList<String> webpagelist;
