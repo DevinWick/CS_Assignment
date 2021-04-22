@@ -1,4 +1,4 @@
-# CS_Assignment
+# Web Page Ranker based on Term Frequency - Inverse Document Frequency 
 This app compares given url of a web page to give the best matching web page from the web pages in the Database
 Web page with the best ranking is given as the match and TF-IDF statistics are calculated and used to compare web pages
 
